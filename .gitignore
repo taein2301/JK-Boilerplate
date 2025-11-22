@@ -42,6 +42,7 @@ venv/
 # Logs  
 logs/
 logs/*
+*.log
 
 # IDE
 .vscode/
@@ -53,3 +54,6 @@ logs/*
 .DS_Store
 Thumbs.db
 *.pyc
+
+.pytest_cache
+.ruff_cache

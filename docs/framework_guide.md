@@ -10,6 +10,7 @@
 2.  [아키텍처](#아키텍처)
 3.  [설정 가이드](#설정-가이드)
 4.  [개발 가이드](#개발-가이드)
+5.  [Git 워크플로우 가이드](#git-워크플로우-가이드)
 
 ---
 
@@ -361,4 +362,142 @@ uv pip install <package_name>
     - 앱/배치 시작 시 (`🚀 App Started`)
     - 앱/배치 정상 종료 시 (`🏁 App Stopped`)
     - 예외 발생 시 (`🚨 App Failed: ...`)
+
+---
+
+# Git 워크플로우 가이드
+
+이 섹션은 **"공통 프레임워크(Boilerplate)"**를 기반으로 **"개별 애플리케이션(App)"**을 개발할 때, 소스 코드를 효율적으로 관리하는 Git 전략을 설명합니다.
+
+## 1. 아키텍처 및 데이터 흐름
+
+개발자는 두 개의 원격 저장소(Remote)와 상호작용합니다.
+
+1.  **Upstream (`jk-boilerplate`)**: 공통 프레임워크 원본. (Read-Only에 가까움)
+2.  **Origin (`my-app`)**: 내가 개발 중인 실제 서비스 저장소. (Read/Write)
+
+### 데이터 흐름도
+
+```mermaid
+graph TD
+    Upstream[Remote: Upstream<br/>jk-boilerplate]
+    Origin[Remote: Origin<br/>My App Repo]
+    Local[Local: My Computer]
+
+    %% Main Flow
+    Upstream -->|1. Fetch Updates| Local
+    Local -->|2. Push App Code| Origin
+    
+    %% Contribution Flow
+    Local -.->|3. Push Bug Fixes| Upstream
+```
+
+## 2. 실전 가이드 (Step-by-Step)
+
+새로운 프로젝트를 시작하는 시점부터 차근차근 진행합니다.
+
+### 1단계: 프로젝트 초기화 (Clone & Setup)
+
+먼저 보일러플레이트 코드를 내려받아 내 프로젝트의 시작점으로 삼습니다.
+
+```bash
+# 1. 보일러플레이트 Clone (내 앱 이름으로 폴더 생성)
+git clone https://github.com/taein2301/jk-boilerplate.git my-awesome-app
+
+# 2. 폴더 이동
+cd my-awesome-app
+
+# 3. 기존 원격 저장소(origin)의 이름을 upstream으로 변경
+# (이제 jk-boilerplate는 'upstream'이라고 부릅니다)
+git remote rename origin upstream
+
+# 4. 내 앱을 위한 새로운 원격 저장소 연결
+# (Github에 미리 빈 저장소를 생성해두어야 합니다)
+git remote add origin https://github.com/my-account/my-awesome-app.git
+
+# 5. 설정 확인
+git remote -v
+# origin   https://github.com/my-account/my-awesome-app.git (fetch/push)
+# upstream https://github.com/taein2301/jk-boilerplate.git (fetch/push)
+```
+
+### 2단계: 프레임워크 업데이트 반영 (Sync)
+
+`jk-boilerplate`에 새로운 기능이나 보안 패치가 나왔을 때, 내 앱에 적용하는 방법입니다.
+
+```bash
+# 1. Upstream의 최신 변경사항 가져오기
+git fetch upstream
+
+# 2. 내 로컬 브랜치(main)에 병합(Merge)
+git merge upstream/main
+```
+*참고: `main` 브랜치에서 작업 중이었다면 충돌(Conflict)이 발생할 수 있습니다. 이는 정상적인 과정이며, 충돌난 파일을 수정하고 커밋하면 됩니다.*
+
+### 3단계: 프레임워크 버그 수정 및 기여 (Contribute)
+
+앱 개발 중에 프레임워크 자체의 버그(`core/`나 `utils/` 등)를 발견했습니다. 이를 수정해서 Upstream에 다시 기여하는 방법입니다.
+**핵심은 내 앱의 비즈니스 로직이 섞이지 않게 하는 것입니다.**
+
+**방법 A: Git Worktree 사용 (권장)**
+물리적으로 폴더를 분리하여 실수할 여지를 없앱니다.
+
+```bash
+# 1. 상위 폴더에 'boilerplate-fix'라는 이름으로 순정 브랜치(upstream/main)를 체크아웃
+git worktree add ../boilerplate-fix upstream/main
+
+# 2. 해당 폴더로 이동
+cd ../boilerplate-fix
+
+# 3. 버그 수정 및 Push
+# (이 폴더에는 내 앱 소스가 없으므로 안심하고 Push 가능)
+git commit -am "Fix: critical bug in utils"
+git push upstream HEAD:main
+
+# 4. 작업 폴더 삭제 (선택)
+cd ../my-awesome-app
+git worktree remove ../boilerplate-fix
+```
+
+**방법 B: 브랜치 분리 사용**
+하나의 폴더에서 브랜치만 바꿔서 작업합니다.
+
+```bash
+# 1. 순정 브랜치 생성 및 이동
+git checkout -b fix/core-bug upstream/main
+
+# 2. 버그 수정 및 Push
+git commit -am "Fix: critical bug in utils"
+git push upstream HEAD:main
+
+# 3. 다시 내 앱 브랜치로 복귀
+git checkout main
+```
+
+## 3. 요약
+
+| 명령어 | 설명 |
+| :--- | :--- |
+| `git remote rename origin upstream` | 기존 연결을 Upstream(원본)으로 변경 |
+| `git remote add origin <URL>` | 내 새 저장소를 Origin(메인)으로 등록 |
+| `git pull upstream main` | 프레임워크 업데이트 받기 |
+| `git push origin main` | 내 앱 저장하기 |
+| `git push upstream main` | **주의!** 프레임워크 원본에 수정사항 반영하기 |
+
+---
+
+## 4. FAQ: Git Submodule은 어떤가요?
+
+"하나의 레포 안에 또 다른 레포를 넣는 방법"으로 `git submodule`이 있습니다. 하지만 **보일러플레이트(Boilerplate) 용도로는 추천하지 않습니다.**
+
+### 비교 분석
+
+| 방식 | 설명 | 장점 | 단점 (보일러플레이트 관점) |
+| :--- | :--- | :--- | :--- |
+| **Upstream Remote** (추천) | 내 앱이 곧 보일러플레이트의 확장판임. (`git merge`로 합침) | 구조가 단순함. 파일을 직접 수정하고 합치기 쉬움. | 앱 코드와 보일러플레이트 코드가 같은 폴더에 섞임. |
+| **Git Submodule** | 내 앱 폴더 안에 `jk-boilerplate` 폴더가 별도로 존재함. | 완벽한 격리. 특정 버전을 고정하기 좋음. | **치명적**: 보일러플레이트의 `main.py`나 설정을 내 입맛대로 고치기 매우 어려움. 파일 경로가 바뀜. |
+
+### 결론
+*   **라이브러리/플러그인**을 가져다 쓰는 경우라면 `Submodule`이 좋습니다. (예: 공용 UI 컴포넌트 라이브러리)
+*   **기초 뼈대(Boilerplate)**로 시작해서 살을 붙이는 경우라면 **Upstream Remote** 방식이 표준입니다. 뼈대 자체를 수정해야 할 일이 많기 때문입니다.
 
