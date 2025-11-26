@@ -2,7 +2,6 @@ ref/*
 .claude/*
 .coverage
 .mcp.json
-CLAUDE.md
 
 config/dev.yaml*
 config/dev.yaml
