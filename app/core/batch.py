@@ -1,4 +1,3 @@
-import time
 from app.utils.config import config
 from app.utils.logger import logger
 from app.utils.telegram import telegram
@@ -11,27 +10,28 @@ class BatchJob:
     def run(self):
         logger.info("🔄 Starting Sample Batch Job")
         
-        supabase.insert_event("start", {"type": "batch"})
+        start_time = logger.info(f"Batch Size: {self.batch_size}")
+        supabase.insert_event("start", {"type": "batch", "batch_size": self.batch_size})
         
         try:
-            logger.info(f"Batch Size: {self.batch_size}")
-            
-            # Mock processing
+            # Mock processing - process items efficiently
             items = range(1, 11)
+            processed_count = 0
+            
             for item in items:
                 self._process_item(item)
+                processed_count += 1
                 
-            logger.info("✅ Batch Job Completed Successfully")
-            telegram.send_sync("✅ Sample Batch Job Completed")
+            logger.info(f"✅ Batch Job Completed Successfully - Processed {processed_count} items")
+            telegram.send_sync(f"✅ Sample Batch Job Completed ({processed_count} items)")
+            supabase.insert_event("stop", {"type": "batch", "items_processed": processed_count})
             
         except Exception as e:
-            logger.error(f"Batch Job Error: {e}")
+            logger.error(f"Batch Job Error: {e}", exc_info=True)
             telegram.send_sync(f"🚨 Batch Job Failed: {e}")
-            supabase.insert_event("abnormal_stop", {"error": str(e)})
+            supabase.insert_event("abnormal_stop", {"type": "batch", "error": str(e)})
             raise
-        finally:
-            supabase.insert_event("stop", {"type": "batch"})
 
     def _process_item(self, item):
+        """Process a single item. Override this method in subclasses."""
         logger.debug(f"Processing item {item}...")
-        time.sleep(0.1)
