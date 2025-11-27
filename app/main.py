@@ -63,6 +63,10 @@ def run_batch(
 
         batch_instance = BatchJob()
         batch_instance.run()
+    elif batch_name == "data-processor":
+        from app.core.data_processor import DataProcessorBatch
+
+        DataProcessorBatch().run()
     else:
         logger.warning(f"Unknown batch: {batch_name}")
 
