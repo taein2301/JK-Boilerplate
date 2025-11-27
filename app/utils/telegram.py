@@ -1,7 +1,10 @@
 import asyncio
+
 from telegram import Bot
+
 from app.utils.config import config
 from app.utils.logger import logger
+
 
 class TelegramService:
     def __init__(self):
@@ -37,5 +40,6 @@ class TelegramService:
             asyncio.run(self.send_message(message))
         except Exception as e:
             logger.error(f"Failed to send sync Telegram message: {e}")
+
 
 telegram = TelegramService()

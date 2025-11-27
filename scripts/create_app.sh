@@ -32,6 +32,31 @@ class ${CLASS_NAME}(App):
 EOF
 
 echo "✅ Created $FILE_PATH"
+
+# Git Remote Setup
+echo ""
+echo "--------------------------------"
+echo "Checking Git Configuration..."
+
+if git remote | grep -q "^upstream$"; then
+    echo "✅ 'upstream' remote already exists. Skipping git setup."
+else
+    if git remote | grep -q "^origin$"; then
+        echo "🔄 Renaming 'origin' to 'upstream'..."
+        git remote rename origin upstream
+        
+        NEW_ORIGIN="https://github.com/taein2301/${APP_NAME}.git"
+        echo "➕ Adding new 'origin' remote: $NEW_ORIGIN"
+        git remote add origin "$NEW_ORIGIN"
+        
+        echo "⚠️  IMPORTANT: Please update the origin URL to your actual repository:"
+        echo "   git remote set-url origin <your-repo-url>"
+    else
+        echo "❌ 'origin' remote not found. Skipping git setup."
+    fi
+fi
+echo "--------------------------------"
+
 echo ""
 echo "Next steps:"
 echo "1. Open app/main.py"

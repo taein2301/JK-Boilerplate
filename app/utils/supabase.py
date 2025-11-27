@@ -1,6 +1,8 @@
-from supabase import create_client, Client
+from supabase import Client, create_client
+
 from app.utils.config import config
 from app.utils.logger import logger
+
 
 class SupabaseService:
     def __init__(self):
@@ -17,16 +19,17 @@ class SupabaseService:
     def insert_event(self, event_type: str, payload: dict):
         if not self.client:
             return
-        
+
         try:
             data = {
                 "app_name": config.name,
                 "env": config.env,
                 "event_type": event_type,
-                "payload": payload
+                "payload": payload,
             }
             self.client.table("app_events").insert(data).execute()
         except Exception as e:
             logger.error(f"Failed to insert event to Supabase: {e}")
+
 
 supabase = SupabaseService()
