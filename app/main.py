@@ -21,11 +21,10 @@ def run_app(
 
     logger.info(f"Starting app: {app_name} in {env} mode")
 
-    if app_name == "my-app":
-        from app.utils.app import App
+    if app_name == "jaupbitts":
+        from app.core.jaupbitts import JaupbittsApp
 
-        app_instance = App()
-        app_instance.run()
+        JaupbittsApp().run()
     else:
         logger.warning(f"Unknown app: {app_name}")
 
