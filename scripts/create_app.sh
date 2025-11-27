@@ -8,7 +8,11 @@ if [ -z "$1" ]; then
 fi
 
 APP_NAME=$1
-CLASS_NAME="$(tr '[:lower:]' '[:upper:]' <<< ${APP_NAME:0:1})${APP_NAME:1}App"
+
+# Convert kebab-case to CamelCase for class name
+# e.g., test-app -> TestAppApp, my-cool-bot -> MyCoolBotApp
+CLASS_NAME=$(python3 -c "print(''.join(word.capitalize() for word in '$APP_NAME'.split('-')))App")
+
 mkdir -p app/core/
 FILE_PATH="app/core/${APP_NAME}.py"
 
@@ -56,31 +60,12 @@ echo ""
 echo "--------------------------------"
 echo "Updating app/main.py..."
 
-MAIN_PY="app/main.py"
-NEW_CODE="    if app_name == \"${APP_NAME}\":
-        from app.core.${APP_NAME} import ${CLASS_NAME}
-
-        ${CLASS_NAME}().run()
-    el"
-
-# Find the line with 'else:' in run_app function and insert before it
-if grep -q "def run_app" "$MAIN_PY"; then
-    # Use awk to insert before else in run_app function
-    awk -v code="$NEW_CODE" '
-    /^def run_app/ { in_func=1 }
-    /^def / && !/^def run_app/ && in_func { in_func=0 }
-    in_func && /^    else:/ && !done {
-        print code "se:"
-        done=1
-        next
-    }
-    { print }
-    ' "$MAIN_PY" > "${MAIN_PY}.tmp" && mv "${MAIN_PY}.tmp" "$MAIN_PY"
-    echo "✅ Updated $MAIN_PY with new app routing"
+if python3 scripts/update_main.py app "${APP_NAME}" "${CLASS_NAME}"; then
+    echo "✅ Updated app/main.py with new app routing"
 else
-    echo "⚠️  Could not auto-update $MAIN_PY. Please add manually:"
+    echo "⚠️  Could not auto-update app/main.py. Please add manually:"
     echo ""
-    echo "    if app_name == \"${APP_NAME}\":"
+    echo "    elif app_name == \"${APP_NAME}\":"
     echo "        from app.core.${APP_NAME} import ${CLASS_NAME}"
     echo "        ${CLASS_NAME}().run()"
     echo ""

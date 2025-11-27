@@ -8,9 +8,11 @@ if [ -z "$1" ]; then
 fi
 
 BATCH_NAME=$1
-# Convert kebab-case or snake_case to CamelCase for class name
-# e.g., my-batch -> MyBatchBatch
-CLASS_NAME="$(tr '[:lower:]' '[:upper:]' <<< ${BATCH_NAME:0:1})${BATCH_NAME:1}Batch"
+
+# Convert kebab-case to CamelCase for class name
+# e.g., my-batch -> MyBatchBatch, data-process -> DataProcessBatch
+CLASS_NAME=$(python3 -c "print(''.join(word.capitalize() for word in '$BATCH_NAME'.split('-')))Batch")
+
 mkdir -p app/core/
 FILE_PATH="app/core/${BATCH_NAME}.py"
 
@@ -62,31 +64,12 @@ echo ""
 echo "--------------------------------"
 echo "Updating app/main.py..."
 
-MAIN_PY="app/main.py"
-NEW_CODE="    if batch_name == \"${BATCH_NAME}\":
-        from app.core.${BATCH_NAME} import ${CLASS_NAME}
-
-        ${CLASS_NAME}().run()
-    el"
-
-# Find the line with 'else:' in run_batch function and insert before it
-if grep -q "def run_batch" "$MAIN_PY"; then
-    # Use awk to insert before else in run_batch function
-    awk -v code="$NEW_CODE" '
-    /^def run_batch/ { in_func=1 }
-    /^def / && !/^def run_batch/ && in_func { in_func=0 }
-    in_func && /^    else:/ && !done {
-        print code "se:"
-        done=1
-        next
-    }
-    { print }
-    ' "$MAIN_PY" > "${MAIN_PY}.tmp" && mv "${MAIN_PY}.tmp" "$MAIN_PY"
-    echo "✅ Updated $MAIN_PY with new batch routing"
+if python3 scripts/update_main.py batch "${BATCH_NAME}" "${CLASS_NAME}"; then
+    echo "✅ Updated app/main.py with new batch routing"
 else
-    echo "⚠️  Could not auto-update $MAIN_PY. Please add manually:"
+    echo "⚠️  Could not auto-update app/main.py. Please add manually:"
     echo ""
-    echo "    if batch_name == \"${BATCH_NAME}\":"
+    echo "    elif batch_name == \"${BATCH_NAME}\":"
     echo "        from app.core.${BATCH_NAME} import ${CLASS_NAME}"
     echo "        ${CLASS_NAME}().run()"
     echo ""

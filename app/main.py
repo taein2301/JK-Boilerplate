@@ -25,6 +25,10 @@ def run_app(
         from app.core.jaupbitts import JaupbittsApp
 
         JaupbittsApp().run()
+    elif app_name == "my-cool-bot":
+        from app.core.my_cool_bot import 
+
+        ().run()
     else:
         logger.warning(f"Unknown app: {app_name}")
 
