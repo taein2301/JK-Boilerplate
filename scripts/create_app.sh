@@ -11,7 +11,7 @@ APP_NAME=$1
 
 # Convert kebab-case to CamelCase for class name
 # e.g., test-app -> TestAppApp, my-cool-bot -> MyCoolBotApp
-CLASS_NAME=$(python3 -c "print(''.join(word.capitalize() for word in '$APP_NAME'.split('-')))App")
+CLASS_NAME=$(python3 -c "print(''.join(word.capitalize() for word in '$APP_NAME'.split('-')) + 'App')")
 
 mkdir -p app/core/
 FILE_PATH="app/core/${APP_NAME}.py"

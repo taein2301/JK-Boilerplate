@@ -1,10 +1,10 @@
 from app.utils.app import App
 from app.utils.logger import logger
 
-class (App):
+class UpbitTraderApp(App):
     def run(self):
         super().run()
         
-        logger.info("my-cool-bot App is running!")
+        logger.info("upbit-trader App is running!")
         # Add your business logic here
         

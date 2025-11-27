@@ -29,6 +29,10 @@ def run_app(
         from app.core.my_cool_bot import 
 
         ().run()
+    elif app_name == "upbit-trader":
+        from app.core.upbit_trader import UpbitTraderApp
+
+        UpbitTraderApp().run()
     else:
         logger.warning(f"Unknown app: {app_name}")
 

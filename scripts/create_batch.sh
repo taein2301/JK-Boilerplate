@@ -11,7 +11,7 @@ BATCH_NAME=$1
 
 # Convert kebab-case to CamelCase for class name
 # e.g., my-batch -> MyBatchBatch, data-process -> DataProcessBatch
-CLASS_NAME=$(python3 -c "print(''.join(word.capitalize() for word in '$BATCH_NAME'.split('-')))Batch")
+CLASS_NAME=$(python3 -c "print(''.join(word.capitalize() for word in '$BATCH_NAME'.split('-')) + 'Batch')")
 
 mkdir -p app/core/
 FILE_PATH="app/core/${BATCH_NAME}.py"
