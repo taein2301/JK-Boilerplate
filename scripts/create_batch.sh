@@ -55,8 +55,12 @@ else
         echo "➕ Adding new 'origin' remote: $NEW_ORIGIN"
         git remote add origin "$NEW_ORIGIN"
         
-        echo "⚠️  IMPORTANT: Please update the origin URL to your actual repository:"
-        echo "   git remote set-url origin <your-repo-url>"
+        # Create private GitHub repository if it does not exist
+        REPO_NAME=$(basename "$NEW_ORIGIN" .git)
+        if ! gh repo view "$REPO_NAME" > /dev/null 2>&1; then
+            echo "🛠️ Creating private GitHub repository $REPO_NAME"
+            gh repo create "$REPO_NAME" --private --confirm
+        fi
     else
         echo "❌ 'origin' remote not found. Skipping git setup."
     fi

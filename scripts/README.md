@@ -10,7 +10,10 @@
 
 **사용법:**
 ```bash
+# Run from project root
 ./scripts/create_app.sh <app_name>
+# Or use the Python wrapper (requires Python 3.9+)
+./scripts/create_app.py <app_name>
 ```
 
 **예시:**
