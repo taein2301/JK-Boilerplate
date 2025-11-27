@@ -19,7 +19,7 @@ def run_app(
     logger.info(f"Starting app: {app_name} in {env} mode")
     
     if app_name == "my-app":
-        from app.core.app import App
+        from app.utils.app import App
         app_instance = App()
         app_instance.run()
     else:
@@ -44,7 +44,7 @@ def run_batch(
     logger.info(f"Starting batch: {batch_name} in {env} mode")
     
     if batch_name == "my-batch":
-        from app.core.batch import BatchJob
+        from app.utils.batch import BatchJob
         batch_instance = BatchJob()
         batch_instance.run()
     else:

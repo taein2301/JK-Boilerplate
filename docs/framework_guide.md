@@ -129,12 +129,12 @@ uv run batch --help
 - `run_batch`: 배치 작업을 처리합니다.
 
 ### 2. 코어 로직 (`app/core/`)
-실제 비즈니스 로직을 포함합니다.
-- **App (`app.py`)**: 장기 실행 프로세스의 베이스입니다. `run()` 메서드를 구현합니다.
-- **Batch (`batch.py`)**: 배치 작업의 베이스입니다. `run()` 메서드를 구현합니다.
+실제 비즈니스 로직을 포함합니다. 각 앱과 배치의 구현체가 위치합니다.
 
 ### 3. 유틸리티 (`app/utils/`)
-애플리케이션 전반에서 사용되는 공유 리소스입니다.
+애플리케이션 전반에서 사용되는 공유 리소스 및 베이스 클래스입니다.
+- **App (`app.py`)**: 장기 실행 프로세스의 베이스 클래스입니다.
+- **Batch (`batch.py`)**: 배치 작업의 베이스 클래스입니다.
 - **Config (`config.py`)**: `Pydantic Settings`를 사용하여 애플리케이션 설정을 관리합니다.
 - **Logger (`logger.py`)**: 로깅을 위해 `Loguru`를 설정합니다.
 - **Services**:
@@ -231,6 +231,22 @@ def my_function():
 
 ## 새로운 애플리케이션 추가
 
+### 방법 A: 스크립트 사용 (권장)
+
+`scripts/create_app.sh` 스크립트를 사용하면 보일러플레이트 코드를 자동으로 생성할 수 있습니다.
+
+```bash
+# 실행 권한 부여 (최초 1회)
+chmod +x scripts/create_app.sh
+
+# 앱 생성
+./scripts/create_app.sh my-new-app
+```
+
+스크립트가 실행되면 `app/core/my_new_app.py` 파일이 생성되고, `app/main.py`에 추가해야 할 코드가 출력됩니다.
+
+### 방법 B: 수동 생성
+
 1.  **App 클래스 생성**:
     `app/core/`에 새 파일(예: `my_new_app.py`)을 생성하고 클래스를 정의합니다.
     ```python
@@ -261,6 +277,20 @@ def my_function():
     ```
 
 ## 새로운 배치 작업 추가
+
+### 방법 A: 스크립트 사용 (권장)
+
+`scripts/create_batch.sh` 스크립트를 사용하면 보일러플레이트 코드를 자동으로 생성할 수 있습니다.
+
+```bash
+# 실행 권한 부여 (최초 1회)
+chmod +x scripts/create_batch.sh
+
+# 배치 생성
+./scripts/create_batch.sh data-process
+```
+
+### 방법 B: 수동 생성
 
 1.  **Batch 클래스 생성**:
     `app/core/`에 새 파일(예: `data_batch.py`)을 생성합니다.

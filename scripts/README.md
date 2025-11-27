@@ -1,25 +1,43 @@
-# 스크립트 디렉토리
+# Helper Scripts
 
-이 디렉토리는 개발, 운영 또는 유지 보수에는 유용하지만 메인 애플리케이션 로직의 일부는 아닌 독립 실행형 스크립트를 위한 곳입니다.
+이 디렉토리는 개발 편의를 위한 헬퍼 스크립트들을 포함하고 있습니다.
 
-## 여기에 포함될 스크립트 예시:
+## 사용 가능한 스크립트
 
-- **데이터베이스 마이그레이션**: 데이터베이스 스키마를 초기화하거나 업데이트하는 스크립트.
-- **데이터 시딩**: 데이터베이스에 초기 데이터를 채우는 스크립트.
-- **배포**: Docker 이미지를 빌드하거나 서버에 배포하는 쉘 스크립트.
-- **유지 보수**: 정리 스크립트, 로그 로테이션 도우미 또는 상태 확인 스크립트.
-- **일회성 작업**: 데이터 문제를 수정하거나 보고서를 생성하는 스크립트.
+### 1. `create_app.sh`
 
-## 사용법
+새로운 장기 실행 애플리케이션(App)을 생성합니다.
 
-`uv run`을 사용하여 이러한 스크립트를 직접 실행할 수 있습니다:
-
+**사용법:**
 ```bash
-uv run python scripts/my_script.py
+./scripts/create_app.sh <app_name>
 ```
 
-또는 쉘 스크립트인 경우:
-
+**예시:**
 ```bash
-./scripts/deploy.sh
+./scripts/create_app.sh upbit
 ```
+
+**동작:**
+- `app/core/<app_name>.py` 파일을 생성합니다.
+- `app.utils.app.App`을 상속받는 기본 클래스 코드를 작성합니다.
+- `app/main.py`에 등록해야 할 코드를 안내합니다.
+
+### 2. `create_batch.sh`
+
+새로운 배치 작업(Batch)을 생성합니다.
+
+**사용법:**
+```bash
+./scripts/create_batch.sh <batch_name>
+```
+
+**예시:**
+```bash
+./scripts/create_batch.sh my-batch
+```
+
+**동작:**
+- `app/core/<batch_name>.py` 파일을 생성합니다.
+- `app.utils.batch.BatchJob`을 상속받는 기본 클래스 코드를 작성합니다.
+- `app/main.py`에 등록해야 할 코드를 안내합니다.

@@ -5,9 +5,7 @@ from app.utils.supabase import supabase
 
 class App:
     def __init__(self):
-        # Example config loading
-        self.stop_loss = config.api_configs.get("app.stop_loss", 2.0)
-        self.take_profit = config.api_configs.get("app.take_profit", 5.0)
+        pass
 
     def run(self):
         logger.info("📈 Starting App")
@@ -19,12 +17,9 @@ class App:
         try:
             self._validate_config()
             
-            logger.info(f"App Settings: Stop Loss {self.stop_loss}%, Take Profit {self.take_profit}%")
             logger.info("Initializing App...")
             
-            # Mock logic
-            logger.info("App Initialized")
-            logger.info("Executing app logic (Mock)...")
+            # Subclasses should implement their logic here
             
             logger.info("🎯 App execution finished")
             
@@ -38,6 +33,5 @@ class App:
             telegram.send_sync("🏁 App Stopped")
 
     def _validate_config(self):
-        # Example validation using Pydantic config would be better, 
-        # but here we check if specific keys exist in the generic dict if needed
+        # Override this method to validate config
         pass
