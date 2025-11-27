@@ -9,12 +9,13 @@ fi
 
 BATCH_NAME=$1
 
-# Convert kebab-case to CamelCase for class name
-# e.g., my-batch -> MyBatchBatch, data-process -> DataProcessBatch
+# Convert kebab-case to snake_case for file name and CamelCase for class name
+# e.g., my-batch -> my_batch.py, MyBatchBatch
+MODULE_NAME=$(echo "$BATCH_NAME" | tr '-' '_')
 CLASS_NAME=$(python3 -c "print(''.join(word.capitalize() for word in '$BATCH_NAME'.split('-')) + 'Batch')")
 
 mkdir -p app/core/
-FILE_PATH="app/core/${BATCH_NAME}.py"
+FILE_PATH="app/core/${MODULE_NAME}.py"
 
 # Check if file already exists
 if [ -f "$FILE_PATH" ]; then

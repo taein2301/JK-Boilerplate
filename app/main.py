@@ -25,10 +25,10 @@ def run_app(
         from app.core.jaupbitts import JaupbittsApp
 
         JaupbittsApp().run()
-    elif app_name == "my-cool-bot":
-        from app.core.my_cool_bot import 
+    elif app_name == "upbit-trader":
+        from app.core.upbit_trader import UpbitTraderApp
 
-        ().run()
+        UpbitTraderApp().run()
     elif app_name == "upbit-trader":
         from app.core.upbit_trader import UpbitTraderApp
 
