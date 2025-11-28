@@ -1,4 +1,5 @@
 import typer
+import importlib
 
 from app.utils.config import config
 from app.utils.logger import logger
@@ -21,20 +22,21 @@ def run_app(
 
     logger.info(f"Starting app: {app_name} in {env} mode")
 
-    if app_name == "jaupbitts":
-        from app.core.jaupbitts import JaupbittsApp
+    try:
+        # Convert kebab-case to snake_case for module name
+        module_name = app_name.replace("-", "_")
+        # Convert kebab-case to CamelCase for class name
+        class_name = "".join(word.capitalize() for word in app_name.split("-")) + "App"
 
-        JaupbittsApp().run()
-    elif app_name == "upbit-trader":
-        from app.core.upbit_trader import UpbitTraderApp
-
-        UpbitTraderApp().run()
-    elif app_name == "upbit-trader":
-        from app.core.upbit_trader import UpbitTraderApp
-
-        UpbitTraderApp().run()
-    else:
-        logger.warning(f"Unknown app: {app_name}")
+        module = importlib.import_module(f"app.core.{module_name}")
+        app_class = getattr(module, class_name)
+        app_class().run()
+    except ImportError:
+        logger.error(f"App module 'app.core.{module_name}' not found for {app_name}")
+    except AttributeError:
+        logger.error(f"App class '{class_name}' not found in 'app.core.{module_name}'")
+    except Exception as e:
+        logger.error(f"Error running app {app_name}: {e}")
 
     logger.info(f"App {app_name} finished")
 
@@ -58,17 +60,26 @@ def run_batch(
 
     logger.info(f"Starting batch: {batch_name} in {env} mode")
 
-    if batch_name == "my-batch":
-        from app.utils.batch import BatchJob
+    try:
+        # Special case for generic batch job if needed, or just rely on dynamic loading
+        if batch_name == "my-batch":
+             from app.utils.batch import BatchJob
+             BatchJob().run()
+        else:
+            # Convert kebab-case to snake_case for module name
+            module_name = batch_name.replace("-", "_")
+            # Convert kebab-case to CamelCase for class name
+            class_name = "".join(word.capitalize() for word in batch_name.split("-")) + "Batch"
 
-        batch_instance = BatchJob()
-        batch_instance.run()
-    elif batch_name == "data-processor":
-        from app.core.data_processor import DataProcessorBatch
-
-        DataProcessorBatch().run()
-    else:
-        logger.warning(f"Unknown batch: {batch_name}")
+            module = importlib.import_module(f"app.core.{module_name}")
+            batch_class = getattr(module, class_name)
+            batch_class().run()
+    except ImportError:
+        logger.error(f"Batch module 'app.core.{module_name}' not found for {batch_name}")
+    except AttributeError:
+        logger.error(f"Batch class '{class_name}' not found in 'app.core.{module_name}'")
+    except Exception as e:
+        logger.error(f"Error running batch {batch_name}: {e}")
 
     logger.info(f"Batch {batch_name} finished")
 

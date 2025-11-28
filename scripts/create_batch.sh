@@ -9,6 +9,12 @@ fi
 
 BATCH_NAME=$1
 
+wait_for_user() {
+    echo ""
+    read -p "Press Enter to continue..."
+    echo ""
+}
+
 # Convert kebab-case to snake_case for file name and CamelCase for class name
 # e.g., my-batch -> my_batch.py, MyBatchBatch
 MODULE_NAME=$(echo "$BATCH_NAME" | tr '-' '_')
@@ -44,6 +50,7 @@ EOF
 echo "✅ Created $FILE_PATH"
 
 # Setup .env file
+wait_for_user
 echo ""
 echo "--------------------------------"
 echo "Setting up .env file..."
@@ -60,24 +67,10 @@ else
 fi
 echo "--------------------------------"
 
-# Update main.py automatically
-echo ""
-echo "--------------------------------"
-echo "Updating app/main.py..."
 
-if python3 scripts/update_main.py batch "${BATCH_NAME}" "${CLASS_NAME}"; then
-    echo "✅ Updated app/main.py with new batch routing"
-else
-    echo "⚠️  Could not auto-update app/main.py. Please add manually:"
-    echo ""
-    echo "    elif batch_name == \"${BATCH_NAME}\":"
-    echo "        from app.core.${BATCH_NAME} import ${CLASS_NAME}"
-    echo "        ${CLASS_NAME}().run()"
-    echo ""
-fi
-echo "--------------------------------"
 
 # Git Remote Setup
+wait_for_user
 echo ""
 echo "--------------------------------"
 echo "Checking Git Configuration..."
@@ -106,6 +99,7 @@ fi
 echo "--------------------------------"
 
 # Git commit and push
+wait_for_user
 echo ""
 echo "--------------------------------"
 echo "Committing changes..."
