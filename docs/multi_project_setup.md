@@ -87,7 +87,7 @@ git push origin main
 
 ## 4. 구조적 이점
 
-최근 진행한 **Core to Utils 리팩토링**(`app.py`, `batch.py`를 `utils`로 이동) 덕분에 이 구조가 더욱 견고해졌습니다.
+최근 진행한 **Core to Utils 리팩토링**(`app.py`를 `utils`로 이동) 덕분에 이 구조가 더욱 견고해졌습니다.
 
 - **`app/utils/`**: 공통 영역 (Upstream 관리)
 - **`app/core/`**: 프로젝트별 영역 (Origin 관리)

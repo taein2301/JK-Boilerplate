@@ -1,6 +1,6 @@
 # JK Boilerplate 프레임워크 가이드
 
-**JK Boilerplate** 문서에 오신 것을 환영합니다. 이 프로젝트는 장기 실행 서비스 및 배치 작업을 포함하여 확장 가능하고 유지 관리하기 쉬운 애플리케이션을 구축하기 위해 설계된 범용 Python 애플리케이션 프레임워크입니다.
+**JK Boilerplate** 문서에 오신 것을 환영합니다. 이 프로젝트는 장기 실행 서비스를 포함하여 확장 가능하고 유지 관리하기 쉬운 애플리케이션을 구축하기 위해 설계된 범용 Python 애플리케이션 프레임워크입니다.
 
 ---
 
@@ -64,7 +64,7 @@
 
 ## 사용법
 
-이 프로젝트는 `app`과 `batch`라는 두 가지 주요 진입점이 있는 통합 CLI를 사용합니다.
+이 프로젝트는 `app`이라는 주요 진입점이 있는 통합 CLI를 사용합니다.
 
 ### 애플리케이션 실행
 
@@ -79,18 +79,7 @@ uv run app <app-name> --env <env>
   uv run app my-app --env dev
   ```
 
-### 배치 작업 실행
 
-일회성 배치 작업을 실행하려면:
-
-```bash
-uv run batch <batch-name> --env <env>
-```
-
-- **예시:**
-  ```bash
-  uv run batch my-batch --env dev
-  ```
 
 ### 도움말 확인
 
@@ -98,7 +87,7 @@ uv run batch <batch-name> --env <env>
 
 ```bash
 uv run app --help
-uv run batch --help
+
 ```
 
 ---
@@ -126,15 +115,13 @@ uv run batch --help
 ### 1. CLI 진입점 (`app/main.py`)
 애플리케이션의 진입점입니다. `Typer`를 사용하여 명령어를 정의하고 적절한 코어 모듈로 실행을 라우팅합니다.
 - `run_app`: 장기 실행 애플리케이션을 처리합니다.
-- `run_batch`: 배치 작업을 처리합니다.
 
 ### 2. 코어 로직 (`app/core/`)
-실제 비즈니스 로직을 포함합니다. 각 앱과 배치의 구현체가 위치합니다.
+실제 비즈니스 로직을 포함합니다. 각 앱의 구현체가 위치합니다.
 
 ### 3. 유틸리티 (`app/utils/`)
 애플리케이션 전반에서 사용되는 공유 리소스 및 베이스 클래스입니다.
 - **App (`app.py`)**: 장기 실행 프로세스의 베이스 클래스입니다.
-- **Batch (`batch.py`)**: 배치 작업의 베이스 클래스입니다.
 - **Config (`config.py`)**: `Pydantic Settings`를 사용하여 애플리케이션 설정을 관리합니다.
 - **Logger (`logger.py`)**: 로깅을 위해 `Loguru`를 설정합니다.
 - **Services**:
@@ -276,50 +263,7 @@ chmod +x scripts/create_app.sh
     uv run app my-new-app --env dev
     ```
 
-## 새로운 배치 작업 추가
 
-### 방법 A: 스크립트 사용 (권장)
-
-`scripts/create_batch.sh` 스크립트를 사용하면 보일러플레이트 코드를 자동으로 생성할 수 있습니다.
-
-```bash
-# 실행 권한 부여 (최초 1회)
-chmod +x scripts/create_batch.sh
-
-# 배치 생성
-./scripts/create_batch.sh data-process
-```
-
-### 방법 B: 수동 생성
-
-1.  **Batch 클래스 생성**:
-    `app/core/`에 새 파일(예: `data_batch.py`)을 생성합니다.
-    ```python
-    # app/core/data_batch.py
-    from app.utils.logger import logger
-
-    class DataBatch:
-        def run(self):
-            logger.info("Processing data...")
-            # 여기에 배치 로직 작성
-    ```
-
-2.  **CLI에 등록**:
-    `app/main.py`의 `run_batch` 함수에 새 배치를 포함하도록 업데이트합니다.
-    ```python
-    # app/main.py
-    def run_batch(batch_name: str, ...):
-        # ...
-        if batch_name == "data-process":
-            from app.core.data_batch import DataBatch
-            DataBatch().run()
-        # ...
-    ```
-
-3.  **실행**:
-    ```bash
-    uv run batch data-process --env dev
-    ```
 
 ## 새로운 의존성 추가
 
@@ -362,7 +306,7 @@ uv pip install <package_name>
     4.  기본값 (Default)
 - **주요 설정**:
     - `env`: 실행 환경 (`dev`, `prod` 등). CLI `--env` 옵션으로 필수 입력.
-    - `name`: 앱 이름. CLI 인자(`app_name`, `batch_name`)로 자동 설정됨.
+    - `name`: 앱 이름. CLI 인자(`app_name`)로 자동 설정됨.
     - `log_level`: 로깅 레벨 (`DEBUG`, `INFO`, `WARNING`, `ERROR`).
 
 ## 3. 앱 생명주기 관리 (Lifecycle)
@@ -387,10 +331,10 @@ uv pip install <package_name>
 - **설정**: `.env` 파일에 `TELEGRAM_TOKEN`과 `TELEGRAM_CHAT_ID`가 설정되어 있어야 작동합니다. 설정이 없으면 초기화 단계에서 경고 로그를 남기고 기능은 비활성화됩니다.
 - **동기/비동기 지원**:
     - `send_message(msg)`: `async` 함수로, 비동기 컨텍스트에서 사용합니다.
-    - `send_sync(msg)`: 동기 함수로, 일반적인 코드나 동기식 배치 작업에서 사용합니다. 내부적으로 이벤트 루프를 감지하여 적절하게 처리합니다.
+    - `send_sync(msg)`: 동기 함수로, 일반적인 코드에서 사용합니다. 내부적으로 이벤트 루프를 감지하여 적절하게 처리합니다.
 - **자동 알림**:
-    - 앱/배치 시작 시 (`🚀 App Started`)
-    - 앱/배치 정상 종료 시 (`🏁 App Stopped`)
+    - 앱 시작 시 (`🚀 App Started`)
+    - 앱 정상 종료 시 (`🏁 App Stopped`)
     - 예외 발생 시 (`🚨 App Failed: ...`)
 
 ---

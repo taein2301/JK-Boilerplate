@@ -21,7 +21,7 @@ license = {text = "MIT"}
 
 [project.scripts]
 app = "app.main:app_entry"
-batch = "app.main:batch_entry"
+
 
 [build-system]
 requires = ["hatchling"]
